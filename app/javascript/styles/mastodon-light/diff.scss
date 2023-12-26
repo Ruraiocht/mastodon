@@ -26,23 +26,23 @@ html {
 .column-inline-form,
 .regeneration-indicator {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
   border-top: 0;
 }
 
 .error-column {
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .column > .scrollable.about {
-  border-top: 1px solid lighten($ui-base-color, 8%);
+  border-top: 1px solid lighten($ui-base-color, 4%);
 }
 
 .about__meta,
 .about__section__title,
 .interaction-modal {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .rules-list li::before {
@@ -50,18 +50,18 @@ html {
 }
 
 .directory__card__img {
-  background: lighten($ui-base-color, 12%);
+  background: lighten($ui-base-color, 8%);
 }
 
 .filter-form {
   background: $white;
-  border-bottom: 1px solid lighten($ui-base-color, 8%);
+  border-bottom: 1px solid lighten($ui-base-color, 4%);
 }
 
 .column-back-button,
 .column-header {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 
   @media screen and (max-width: $no-gap-breakpoint) {
     border-top: 0;
@@ -108,7 +108,7 @@ html {
 .confirmation-modal__cancel-button,
 .mute-modal__cancel-button,
 .block-modal__cancel-button {
-  color: lighten($ui-base-color, 26%);
+  color: lighten($ui-base-color, 22%);
 
   &:hover,
   &:focus,
@@ -119,14 +119,14 @@ html {
 
 .column-subheading {
   background: darken($ui-base-color, 4%);
-  border-bottom: 1px solid lighten($ui-base-color, 8%);
+  border-bottom: 1px solid lighten($ui-base-color, 4%);
 }
 
 .getting-started,
 .scrollable {
   .column-link {
     background: $white;
-    border-bottom: 1px solid lighten($ui-base-color, 8%);
+    border-bottom: 1px solid lighten($ui-base-color, 4%);
 
     &:hover,
     &:active,
@@ -137,8 +137,8 @@ html {
 }
 
 .getting-started .navigation-bar {
-  border-top: 1px solid lighten($ui-base-color, 8%);
-  border-bottom: 1px solid lighten($ui-base-color, 8%);
+  border-top: 1px solid lighten($ui-base-color, 4%);
+  border-bottom: 1px solid lighten($ui-base-color, 4%);
 
   @media screen and (max-width: $no-gap-breakpoint) {
     border-top: 0;
@@ -153,7 +153,7 @@ html {
 .setting-text,
 .report-dialog-modal__textarea,
 .audio-player {
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .report-dialog-modal .dialog-option .poll__input {
@@ -180,24 +180,24 @@ html {
 
 .compose-form__poll-wrapper,
 .compose-form__poll-wrapper .poll__footer {
-  border-top-color: lighten($ui-base-color, 8%);
+  border-top-color: lighten($ui-base-color, 4%);
 }
 
 .notification__filter-bar {
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
   border-top: 0;
 }
 
 .compose-form .compose-form__buttons-wrapper {
   background: $ui-base-color;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
   border-top: 0;
 }
 
 .drawer__header,
 .drawer__inner {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .drawer__inner__mastodon {
@@ -234,13 +234,13 @@ html {
     &:focus,
     &:active,
     &.selected {
-      background: lighten($ui-base-color, 4%);
+      background: $ui-base-color;
     }
   }
 }
 
 .emoji-mart-bar {
-  border-color: lighten($ui-base-color, 4%);
+  border-color: $ui-base-color;
 
   &:first-child {
     background: darken($ui-base-color, 6%);
@@ -273,7 +273,7 @@ html {
 
   &:hover,
   &:focus {
-    background: lighten($ui-base-color, 4%);
+    background: $ui-base-color;
   }
 }
 
@@ -336,7 +336,7 @@ html {
 
 .language-dropdown__dropdown__results__item
   .language-dropdown__dropdown__results__item__common-name {
-  color: lighten($ui-base-color, 8%);
+  color: lighten($ui-base-color, 4%);
 }
 
 .language-dropdown__dropdown__results__item.active
@@ -349,11 +349,11 @@ html {
 .dropdown-menu__container__header,
 .compare-history-modal .report-modal__target,
 .report-dialog-modal .poll__option.dialog-option {
-  border-bottom-color: lighten($ui-base-color, 4%);
+  border-bottom-color: $ui-base-color;
 }
 
 .report-dialog-modal__container {
-  border-top-color: lighten($ui-base-color, 4%);
+  border-top-color: $ui-base-color;
 }
 
 // Change the background colors of modals
@@ -375,7 +375,7 @@ html {
 .picture-in-picture__footer,
 .reactions-bar__item {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .reactions-bar__item:hover,
@@ -389,7 +389,7 @@ html {
 
 .reactions-bar__item.active {
   background-color: mix($white, $ui-highlight-color, 80%);
-  border-color: mix(lighten($ui-base-color, 8%), $ui-highlight-color, 80%);
+  border-color: mix(lighten($ui-base-color, 4%), $ui-highlight-color, 80%);
 }
 
 .media-modal__overlay .picture-in-picture__footer {
@@ -411,16 +411,16 @@ html {
 }
 
 .report-modal__comment {
-  border-right-color: lighten($ui-base-color, 8%);
+  border-right-color: lighten($ui-base-color, 4%);
 }
 
 .report-modal__container {
-  border-top-color: lighten($ui-base-color, 8%);
+  border-top-color: lighten($ui-base-color, 4%);
 }
 
 .column-header__collapsible-inner {
   background: darken($ui-base-color, 4%);
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
   border-bottom: 0;
 }
 
@@ -462,10 +462,10 @@ html {
 
 .embed-modal .embed-modal__container .embed-modal__html {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 
   &:focus {
-    border-color: lighten($ui-base-color, 12%);
+    border-color: lighten($ui-base-color, 8%);
     background: $white;
   }
 }
@@ -493,7 +493,7 @@ html {
 // Change the default colors used on some parts of the profile pages
 .activity-stream-tabs {
   background: $account-background-color;
-  border-bottom-color: lighten($ui-base-color, 8%);
+  border-bottom-color: lighten($ui-base-color, 4%);
 }
 
 .nothing-here,
@@ -501,7 +501,7 @@ html {
 .directory__tag > a,
 .directory__tag > div {
   background: $white;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 
   @media screen and (max-width: $no-gap-breakpoint) {
     border-left: 0;
@@ -517,15 +517,15 @@ html {
   input[type='password'],
   textarea {
     &:hover {
-      border-color: lighten($ui-base-color, 12%);
+      border-color: lighten($ui-base-color, 8%);
     }
   }
 }
 
 .picture-in-picture-placeholder {
   background: $white;
-  border-color: lighten($ui-base-color, 8%);
-  color: lighten($ui-base-color, 8%);
+  border-color: lighten($ui-base-color, 4%);
+  color: lighten($ui-base-color, 4%);
 }
 
 .directory__tag > a {
@@ -544,12 +544,12 @@ html {
   &__toolbar,
   &__row,
   .nothing-here {
-    border-color: lighten($ui-base-color, 8%);
+    border-color: lighten($ui-base-color, 4%);
   }
 }
 
 .activity-stream {
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 
   &--under-tabs {
     border-top: 0;
@@ -561,7 +561,7 @@ html {
     .detailed-status.light,
     .more.light,
     .status.light {
-      border-bottom-color: lighten($ui-base-color, 8%);
+      border-bottom-color: lighten($ui-base-color, 4%);
     }
   }
 
@@ -628,7 +628,7 @@ html {
 
 .reply-indicator {
   background: transparent;
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
 }
 
 .status__content,
@@ -657,7 +657,7 @@ html {
 }
 
 .mute-modal select {
-  border: 1px solid lighten($ui-base-color, 8%);
+  border: 1px solid lighten($ui-base-color, 4%);
   background: $simple-background-color
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.933 18.467' height='19.698' width='15.929'><path d='M3.467 14.967l-3.393-3.5H14.86l-3.392 3.5c-1.866 1.925-3.666 3.5-4 3.5-.335 0-2.135-1.575-4-3.5zm.266-11.234L7.467 0 11.2 3.733l3.733 3.734H0l3.733-3.734z' fill='#{hex-color(lighten($ui-base-color, 8%))}'/></svg>")
     no-repeat right 8px center / auto 16px;

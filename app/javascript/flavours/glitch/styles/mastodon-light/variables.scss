@@ -2,16 +2,16 @@
 $black: #000000;
 $white: #ffffff;
 
-$classic-base-color: #282c37;
-$classic-primary-color: #9baec8;
-$classic-secondary-color: #d9e1e8;
-$classic-highlight-color: #6364ff;
+$classic-base-color: #132c5c;
+$classic-primary-color: #6caadd; // Celtic Blue 300
+$classic-secondary-color: #e3f0f9; // Celtic Blue 50
+$classic-highlight-color: #357cc3; // Celtic Blue 600
 
-$blurple-600: #563acc; // Iris
-$blurple-500: #6364ff; // Brand purple
-$blurple-300: #858afa; // Faded Blue
-$grey-600: #4e4c5a; // Trout
-$grey-100: #dadaf3; // Topaz
+$blurple-600: #1b3e80; // Celtic Blue
+$blurple-500: #265b9f; // Celtic Blue 800
+$blurple-300: #357cc3; // Celtic Blue 600
+$grey-600: #435578;
+$grey-100: #d1dbf0;
 
 // Differences
 $success-green: lighten(#3c754d, 8%);
@@ -20,8 +20,8 @@ $base-overlay-background: $white !default;
 $valid-value-color: $success-green !default;
 
 $ui-base-color: $classic-secondary-color !default;
-$ui-base-lighter-color: #b0c0cf;
-$ui-primary-color: #9bcbed;
+$ui-base-lighter-color: #bbd9f1; // Celtic Blue 100
+$ui-primary-color: #92c2e7; // Celtic Blue 200
 $ui-secondary-color: $classic-base-color !default;
 $ui-highlight-color: $classic-highlight-color !default;
 
