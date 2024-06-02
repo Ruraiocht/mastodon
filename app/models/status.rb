@@ -41,6 +41,9 @@ class Status < ApplicationRecord
   include Status::SnapshotConcern
   include Status::ThreadingConcern
 
+  MEDIA_ATTACHMENTS_LIMIT = 4
+  REMOTE_MEDIA_ATTACHMENTS_LIMIT = 16
+
   rate_limit by: :account, family: :statuses
 
   self.discard_column = :deleted_at
@@ -52,7 +55,7 @@ class Status < ApplicationRecord
   update_index('statuses', :proper)
   update_index('public_statuses', :proper)
 
-  enum visibility: { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4 }, _suffix: :visibility
+  enum :visibility, { public: 0, unlisted: 1, private: 2, direct: 3, limited: 4 }, suffix: :visibility
 
   belongs_to :application, class_name: 'Doorkeeper::Application', optional: true
 
@@ -61,8 +64,10 @@ class Status < ApplicationRecord
   belongs_to :conversation, optional: true
   belongs_to :preloadable_poll, class_name: 'Poll', foreign_key: 'poll_id', optional: true, inverse_of: false
 
-  belongs_to :thread, foreign_key: 'in_reply_to_id', class_name: 'Status', inverse_of: :replies, optional: true
-  belongs_to :reblog, foreign_key: 'reblog_of_id', class_name: 'Status', inverse_of: :reblogs, optional: true
+  with_options class_name: 'Status', optional: true do
+    belongs_to :thread, foreign_key: 'in_reply_to_id', inverse_of: :replies
+    belongs_to :reblog, foreign_key: 'reblog_of_id', inverse_of: :reblogs
+  end
 
   has_many :favourites, inverse_of: :status, dependent: :destroy
   has_many :bookmarks, inverse_of: :status, dependent: :destroy
@@ -83,7 +88,7 @@ class Status < ApplicationRecord
   has_many :local_bookmarked, -> { merge(Account.local) }, through: :bookmarks, source: :account
   has_many :local_replied, -> { merge(Account.local) }, through: :replies, source: :account
 
-  has_and_belongs_to_many :tags
+  has_and_belongs_to_many :tags # rubocop:disable Rails/HasAndBelongsToMany
 
   has_one :preview_cards_status, inverse_of: :status, dependent: :delete
 
@@ -108,12 +113,13 @@ class Status < ApplicationRecord
   scope :remote, -> { where(local: false).where.not(uri: nil) }
   scope :local,  -> { where(local: true).or(where(uri: nil)) }
   scope :with_accounts, ->(ids) { where(id: ids).includes(:account) }
-  scope :without_replies, -> { where('statuses.reply = FALSE OR statuses.in_reply_to_account_id = statuses.account_id') }
+  scope :without_replies, -> { not_reply.or(reply_to_account) }
+  scope :not_reply, -> { where(reply: false) }
+  scope :reply_to_account, -> { where(arel_table[:in_reply_to_account_id].eq arel_table[:account_id]) }
   scope :without_reblogs, -> { where(statuses: { reblog_of_id: nil }) }
-  scope :with_public_visibility, -> { where(visibility: :public) }
   scope :tagged_with, ->(tag_ids) { joins(:statuses_tags).where(statuses_tags: { tag_id: tag_ids }) }
   scope :not_excluded_by_account, ->(account) { where.not(account_id: account.excluded_from_timeline_account_ids) }
-  scope :not_domain_blocked_by_account, ->(account) { account.excluded_from_timeline_domains.blank? ? left_outer_joins(:account) : left_outer_joins(:account).where('accounts.domain IS NULL OR accounts.domain NOT IN (?)', account.excluded_from_timeline_domains) }
+  scope :not_domain_blocked_by_account, ->(account) { account.excluded_from_timeline_domains.blank? ? left_outer_joins(:account) : left_outer_joins(:account).merge(Account.not_domain_blocked_by_account(account)) }
   scope :not_domain_muted_by_account, lambda { |account|
     return self if account.muted_from_timeline_domains.blank?
 
@@ -132,6 +138,8 @@ class Status < ApplicationRecord
   scope :tagged_with_none, lambda { |tag_ids|
     where('NOT EXISTS (SELECT * FROM statuses_tags forbidden WHERE forbidden.status_id = statuses.id AND forbidden.tag_id IN (?))', tag_ids)
   }
+  scope :distributable_visibility, -> { where(visibility: %i(public unlisted)) }
+  scope :list_eligible_visibility, -> { where(visibility: %i(public unlisted private)) }
 
   scope :not_local_only, -> { where(local_only: [false, nil]) }
 
@@ -166,9 +174,9 @@ class Status < ApplicationRecord
                    :status_stat,
                    :tags,
                    :preloadable_poll,
-                   preview_cards_status: [:preview_card],
+                   preview_cards_status: { preview_card: { author_account: [:account_stat, user: :role] } },
                    account: [:account_stat, user: :role],
-                   active_mentions: { account: :account_stat },
+                   active_mentions: :account,
                    reblog: [
                      :application,
                      :tags,
@@ -176,11 +184,11 @@ class Status < ApplicationRecord
                      :conversation,
                      :status_stat,
                      :preloadable_poll,
-                     preview_cards_status: [:preview_card],
+                     preview_cards_status: { preview_card: { author_account: [:account_stat, user: :role] } },
                      account: [:account_stat, user: :role],
-                     active_mentions: { account: :account_stat },
+                     active_mentions: :account,
                    ],
-                   thread: { account: :account_stat }
+                   thread: :account
 
   delegate :domain, to: :account, prefix: true
 
@@ -277,7 +285,7 @@ class Status < ApplicationRecord
   end
 
   def reported?
-    @reported ||= Report.where(target_account: account).unresolved.where('? = ANY(status_ids)', id).exists?
+    @reported ||= account.targeted_reports.unresolved.exists?(['? = ANY(status_ids)', id]) || account.strikes.exists?(['? = ANY(status_ids)', id.to_s])
   end
 
   def emojis
@@ -348,23 +356,23 @@ class Status < ApplicationRecord
 
       # _from_me part does not require any timeline filters
       query_from_me = where(account_id: account.id)
-                      .where(Status.arel_table[:visibility].eq(3))
+                      .direct_visibility
                       .limit(limit)
-                      .order('statuses.id DESC')
+                      .order(id: :desc)
 
       # _to_me part requires mute and block filter.
       # FIXME: may we check mutes.hide_notifications?
       query_to_me = Status
+                    .direct_visibility
                     .joins(:mentions)
-                    .merge(Mention.where(account_id: account.id))
-                    .where(Status.arel_table[:visibility].eq(3))
+                    .where(mentions: { account_id: account.id })
                     .limit(limit)
                     .order('mentions.status_id DESC')
                     .not_excluded_by_account(account)
 
       if max_id.present?
-        query_from_me = query_from_me.where('statuses.id < ?', max_id)
-        query_to_me = query_to_me.where('mentions.status_id < ?', max_id)
+        query_from_me = query_from_me.where(id: ...max_id)
+        query_to_me = query_to_me.where(mentions: { status_id: ...max_id })
       end
 
       if since_id.present?
@@ -372,9 +380,9 @@ class Status < ApplicationRecord
         query_to_me = query_to_me.where('mentions.status_id > ?', since_id)
       end
 
-      # returns ActiveRecord.Relation
-      items = (query_from_me.select(:id).to_a + query_to_me.select(:id).to_a).uniq(&:id).sort_by(&:id).reverse.take(limit)
-      Status.where(id: items.map(&:id))
+      # TODO: use a single query?
+      ids = (query_from_me.pluck(:id) + query_to_me.pluck(:id)).sort.uniq.reverse.take(limit)
+      Status.where(id: ids)
     end
 
     def favourites_map(status_ids, account_id)
@@ -395,38 +403,6 @@ class Status < ApplicationRecord
 
     def pins_map(status_ids, account_id)
       StatusPin.select('status_id').where(status_id: status_ids).where(account_id: account_id).each_with_object({}) { |p, h| h[p.status_id] = true }
-    end
-
-    def reload_stale_associations!(cached_items)
-      account_ids = []
-
-      cached_items.each do |item|
-        account_ids << item.account_id
-        account_ids << item.reblog.account_id if item.reblog?
-      end
-
-      account_ids.uniq!
-
-      status_ids = cached_items.map { |item| item.reblog? ? item.reblog_of_id : item.id }.uniq
-
-      return if account_ids.empty?
-
-      accounts = Account.where(id: account_ids).includes(:account_stat, :user).index_by(&:id)
-
-      status_stats = StatusStat.where(status_id: status_ids).index_by(&:status_id)
-
-      cached_items.each do |item|
-        item.account = accounts[item.account_id]
-        item.reblog.account = accounts[item.reblog.account_id] if item.reblog?
-
-        if item.reblog?
-          status_stat = status_stats[item.reblog.id]
-          item.reblog.status_stat = status_stat if status_stat.present?
-        else
-          status_stat = status_stats[item.id]
-          item.status_stat = status_stat if status_stat.present?
-        end
-      end
     end
 
     def from_text(text)
@@ -502,7 +478,6 @@ class Status < ApplicationRecord
   def set_visibility
     self.visibility = reblog.visibility if reblog? && visibility.nil?
     self.visibility = (account.locked? ? :private : :public) if visibility.nil?
-    self.sensitive  = false if sensitive.nil?
   end
 
   def set_local_only

@@ -38,7 +38,6 @@ class Form::AdminSettings
     noindex
     outgoing_spoilers
     require_invite_text
-    captcha_enabled
     korean_captcha_enabled
     korean_captcha_question
     korean_captcha_answer
@@ -48,6 +47,8 @@ class Form::AdminSettings
     status_page_url
     captcha_enabled
     authorized_fetch
+    app_icon
+    favicon
   ).freeze
 
   INTEGER_KEYS = %i(
@@ -79,6 +80,8 @@ class Form::AdminSettings
   UPLOAD_KEYS = %i(
     thumbnail
     mascot
+    app_icon
+    favicon
   ).freeze
 
   PSEUDO_KEYS = %i(

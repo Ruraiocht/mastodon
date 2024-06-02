@@ -21,14 +21,13 @@ class DomainBlock < ApplicationRecord
   include DomainNormalizable
   include DomainMaterializable
 
-  enum severity: { silence: 0, suspend: 1, noop: 2 }
+  enum :severity, { silence: 0, suspend: 1, noop: 2 }
 
   validates :domain, presence: true, uniqueness: true, domain: true
 
   has_many :accounts, foreign_key: :domain, primary_key: :domain, inverse_of: false, dependent: nil
   delegate :count, to: :accounts, prefix: true
 
-  scope :matches_domain, ->(value) { where(arel_table[:domain].matches("%#{value}%")) }
   scope :with_user_facing_limitations, -> { where(severity: [:silence, :suspend]) }
   scope :with_limitations, -> { where(severity: [:silence, :suspend]).or(where(reject_media: true)) }
   scope :by_severity, -> { in_order_of(:severity, %w(noop silence suspend)).order(:domain) }
@@ -71,7 +70,7 @@ class DomainBlock < ApplicationRecord
       segments = uri.normalized_host.split('.')
       variants = segments.map.with_index { |_, i| segments[i..].join('.') }
 
-      where(domain: variants).order(Arel.sql('char_length(domain) desc')).first
+      where(domain: variants).by_domain_length.first
     rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
       nil
     end

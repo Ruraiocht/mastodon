@@ -8,6 +8,7 @@ import {
   DomainMuteModal,
   MuteModal,
   BlockModal,
+  DomainBlockModal,
   ReportModal,
   SettingsModal,
   EmbedModal,
@@ -26,7 +27,7 @@ import BundleContainer from '../containers/bundle_container';
 
 import ActionsModal from './actions_modal';
 import AudioModal from './audio_modal';
-import BoostModal from './boost_modal';
+import { BoostModal } from './boost_modal';
 import BundleModalError from './bundle_modal_error';
 import ConfirmationModal from './confirmation_modal';
 import DeprecatedSettingsModal from './deprecated_settings_modal';
@@ -50,6 +51,7 @@ export const MODAL_COMPONENTS = {
   'DOMAIN_MUTE': DomainMuteModal,
   'MUTE': MuteModal,
   'BLOCK': BlockModal,
+  'DOMAIN_BLOCK': DomainBlockModal,
   'REPORT': ReportModal,
   'SETTINGS': SettingsModal,
   'DEPRECATED_SETTINGS': () => Promise.resolve({ default: DeprecatedSettingsModal }),
